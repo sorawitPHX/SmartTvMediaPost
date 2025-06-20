@@ -7,7 +7,7 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('home') }}">
                         {{-- <x-application-logo class="block w-14 h-14 rounded-full shadow-md" /> --}}
-                        <img class="block w-14 h-14 rounded-full shadow-md" src="{{ asset('images/logo.webp') }}"
+                        <img class="block w-12 h-12 rounded-full shadow-md" src="{{ asset('images/logo.webp') }}"
                             alt="Sriwilai Hospital ">
                     </a>
                 </div>
