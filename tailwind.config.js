@@ -21,4 +21,5 @@ export default {
         forms,
         require('daisyui')
     ],
+    darkMode: false, // ปิด dark mode ของ Tailwind
 };

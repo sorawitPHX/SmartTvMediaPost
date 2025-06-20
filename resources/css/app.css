@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.swal2-container {
+    z-index: 9999 !important; /* หรือมากกว่า daisyUI modal เช่น 1050 */
+}
+
+/* บังคับให้ใช้ light mode เสมอ */
+* {
+  color-scheme: light only;
+}
+
+@media (prefers-color-scheme: dark) {
+  * {
+    color-scheme: light only;
+  }
+}

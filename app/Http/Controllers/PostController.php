@@ -89,6 +89,7 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $data = $request->all();
+        $data['duration'] = isset($data['duration']) ? $data['duration'] : -1;
         $data['is_public'] = isset($data['is_public']);
         $data['is_mute'] = isset($data['is_mute']);
         if ($request->hasFile('file')) {
@@ -137,5 +138,34 @@ class PostController extends Controller
         }
 
         return response()->json(['success' => true], 200);
+    }
+
+    /*  -----------  กู้คืนหลายรายการ  ----------- */
+    public function bulkRestore(Request $request)
+    {
+        $ids = $request->input('ids', []);          //  array ของ ID
+        Post::withTrashed()->whereIn('id', $ids)->restore();
+
+        return back()->with('success', 'กู้คืนเรียบร้อย');
+    }
+
+    /*  -----------  ลบถาวรหลายรายการ  ----------- */
+    public function bulkForceDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        $posts = Post::withTrashed()->whereIn('id', $ids)->get();
+
+        foreach ($posts as $post) {
+            $filePath = storage_path('app/public/' . $post->filename);
+            if (file_exists($filePath)) {
+                unlink($filePath); // ลบไฟล์จาก disk
+            }
+        }
+
+        // ลบออกจากฐานข้อมูลแบบถาวร
+        Post::withTrashed()->whereIn('id', $ids)->forceDelete();
+
+        return back()->with('success', 'ลบถาวรแล้วพร้อมไฟล์ใน storage');
     }
 }
