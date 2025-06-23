@@ -8,6 +8,7 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    base: '/', // <= สำคัญมาก ถ้าลืม ใส่ไว้เสมอ
     // server: {
     //     host: '192.168.12.63',
     //     port: 5173,

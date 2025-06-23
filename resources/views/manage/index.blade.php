@@ -122,11 +122,11 @@
                             <div class="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
                                 @if($post->type === 'image')
                                     <img src="{{ asset('storage/' . $post->filename) }}" class="w-full h-full object-cover">
-                                    <div class="absolute top-2 right-2 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                                    {{-- <div class="absolute top-2 right-2 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                                         <svg class="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" clip-rule="evenodd"></path>
                                         </svg>
-                                    </div>
+                                    </div> --}}
                                 @else
                                     <video src="{{ asset('storage/' . $post->filename) }}" class="w-full h-full object-cover" muted></video>
                                     <div class="absolute top-2 right-2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
@@ -217,7 +217,7 @@
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-indigo-100">Last Updated</span>
-                            <span>{{ now()->format('H:i') }}</span>
+                            <span>{{ now()->format('d/m/Y H:i น.') }}</span>
                         </div>
                     </div>
                 </div>

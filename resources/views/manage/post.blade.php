@@ -11,14 +11,14 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl  mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white min-h-[50vh] shadow-sm sm:rounded-lg">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white min-h-[70vh] shadow-sm sm:rounded-lg">
                 <div class="p-6">
-
-                    <h2 class="text-2xl font-bold flex gap-3 flex-col sm:flex-row items-center justify-between">
-                        <span>
-                            จัดการโพสต์
-                        </span>
+                    <h2 class="flex gap-3 flex-col sm:flex-row items-center justify-between">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 ">จัดการโพสต์</h1>
+                            <p class="text-gray-600 mt-1">จัดการโพสต์และการแสดงผลของโพสต์</p>
+                        </div>
                         <div>
                             <button class="btn btn-dash btn-secondary" onclick="openBinModal()">ถังขยะ</button>
                             <button class="btn btn-primary" onclick="openCreateModal()">+ เพิ่มโพสต์ใหม่</button>
