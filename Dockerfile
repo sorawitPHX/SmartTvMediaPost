@@ -1,28 +1,23 @@
-FROM php:8.3-cli
+FROM php:8.3-fpm
 
-# Install extensions
 RUN apt-get update && apt-get install -y \
-    git zip unzip curl libzip-dev libonig-dev \
-    && docker-php-ext-install pdo pdo_mysql zip
-
-# Node + npm (optional: ใช้ Node image ต่างหากก็ได้)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
+    git curl zip unzip libzip-dev libpng-dev libonig-dev \
+    && docker-php-ext-install pdo_mysql zip
 
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Create app directory
 WORKDIR /var/www
 
-# Copy project
-COPY . .
+COPY ./app /var/www
 
-# Install dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev
-RUN npm install && npm run build
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
 RUN php artisan storage:link
 
-EXPOSE 8000
-
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Optional: Vite Build
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install && npm run build
