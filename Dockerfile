@@ -1,28 +1,35 @@
-FROM php:8.3-cli
+# ----- PHP-FPM image -----
+FROM php:8.3-fpm
 
-# Install extensions
+# ติดตั้งส่วนเสริมที่ Laravel ต้องใช้
 RUN apt-get update && apt-get install -y \
-    git zip unzip curl libzip-dev libonig-dev \
-    && docker-php-ext-install pdo pdo_mysql zip
+    git zip unzip curl libzip-dev libpng-dev libonig-dev \
+    && docker-php-ext-install pdo pdo_mysql zip gd
 
-# Node + npm (optional: ใช้ Node image ต่างหากก็ได้)
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
-
-# Composer
+# ติดตั้ง Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Create app directory
-WORKDIR /var/www
+WORKDIR /var/www/html
 
-# Copy project
+# คัดลอก source code (ยกเว้นไฟล์/โฟลเดอร์ที่ .dockerignore ระบุ)
 COPY . .
 
-# Install dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
-RUN npm install && npm run build
+# ติดตั้ง dependency แบบ production
+RUN composer install --no-dev --optimize-autoloader --prefer-dist
+
 RUN php artisan storage:link
 
-EXPOSE 8000
+# Build Vite asset (ต้องมี package.json)
+RUN if [ -f package.json ]; then \
+      curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+      apt-get install -y nodejs && \
+      npm install && npm run build ; \
+    fi
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Cache Laravel (เพิ่มความเร็ว)
+RUN php artisan config:cache \
+ && php artisan route:cache \
+ && php artisan view:cache
+
+# ไฟล์ static อยู่ใน public
+ENV WEB_ROOT=/var/www/html/public

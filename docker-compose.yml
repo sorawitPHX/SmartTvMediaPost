@@ -1,12 +1,23 @@
-
 services:
-  app:
+  app:                     # PHP-FPM + Laravel
     build: .
-    ports:
-      - "80:8000"
-    volumes:
-      - .:/var/www
+    container_name: laravel-app
+    restart: unless-stopped
     environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - APP_URL=http://localhost:80
+      APP_ENV: production          # .env จะถูกอ่านปกติ
+    volumes:
+      - .:/var/www/html            # **ถ้าต้องการ hot-reload dev ให้ keep ไว้**
+    expose:
+      - "9000"                     # เผยให้ nginx ภายใน network เห็น
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: laravel-nginx
+    restart: unless-stopped
+    ports:
+      - "81:80"                    # นอกเครื่อง → 81, ใน container → 80
+    volumes:
+      - .:/var/www/html            # ให้ nginx เห็นไฟล์ public
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
