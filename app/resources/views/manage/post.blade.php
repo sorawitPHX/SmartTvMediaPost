@@ -173,7 +173,7 @@
                 @csrf
 
                 <fieldset class="fieldset">
-                    <legend class="fieldset-legend">ไฟล์ ภาพ/วิดิโอ</legend>
+                    <legend class="fieldset-legend">ไฟล์ ภาพ/วิดิโอ (แนะนำขนาด < 5GB เป็นอัตราส่วน 16:9)</legend>
                     <input id="createFile" required
                         onchange="showPreview(this, 'createPreviewFile'); findFileType(this, 'craeteFileType');"
                         type="file" name="file" accept="image/*,video/*"
