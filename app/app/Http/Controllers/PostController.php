@@ -146,7 +146,12 @@ class PostController extends Controller
         $ids = $request->input('ids', []);          //  array ของ ID
         Post::withTrashed()->whereIn('id', $ids)->restore();
 
-        return back()->with('success', 'กู้คืนเรียบร้อย');
+        return response()->json([
+            'success' => true,
+            'message' => 'กู้คืนเรียบร้อย'
+        ]);
+
+        // return back()->with('success', 'กู้คืนเรียบร้อย');
     }
 
     /*  -----------  ลบถาวรหลายรายการ  ----------- */
@@ -167,6 +172,10 @@ class PostController extends Controller
         // ลบออกจากฐานข้อมูลแบบถาวร
         Post::withTrashed()->whereIn('id', $ids)->forceDelete();
 
-        return back()->with('success', 'ลบถาวรแล้วพร้อมไฟล์ใน storage');
+        return response()->json([
+            'success' => true,
+            'message' => 'ลบถาวรแล้วพร้อมไฟล์ใน storage'
+        ]);
+        // return back()->with('success', 'ลบถาวรแล้วพร้อมไฟล์ใน storage');
     }
 }

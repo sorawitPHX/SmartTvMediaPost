@@ -27,7 +27,6 @@
 
                     <hr class="my-3">
 
-
                     @if (count($posts) == 0)
                         <div role="alert" class="alert alert-info">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -182,7 +181,7 @@
                 </fieldset>
                 <fieldset class="fieldset">
                     <legend class="fieldset-legend">คำอธิบายภาพ</legend>
-                    <input required name="caption" type="text" class="input input-neutral w-full"
+                    <input name="caption" type="text" class="input input-neutral w-full"
                         placeholder="คำอธิบาย" />
                 </fieldset>
                 <fieldset class="fieldset">
@@ -285,7 +284,7 @@
 
     <!-- Bin Modal -->
     <dialog id="binModal" class="modal modal-bottom sm:modal-middle">
-        <div class="modal-box w-11/12 max-w-3xl">
+        <div class="modal-box w-11/12 max-w-3xl z-[999]">
             <h3 class="font-bold text-lg mb-4">ถังขยะ</h3>
 
             <form id="binForm" class="space-y-3 max-h-80 bg-slate-50 p-3 shadow rounded-md overflow-y-auto">
@@ -307,7 +306,7 @@
                             @endif
                         </div>
                         <span class="truncate flex-1">
-                            {{ $post->caption ?: $post->filename }}
+                            {{ $post->caption ?: '(ไม่มีคำอธิบาย)' }}
                         </span>
                     </label>
                 @endforeach
@@ -320,6 +319,20 @@
             </div>
         </div>
     </dialog>
+
+    <!-- Modal Confirm: ยืนยันการจัดการโพสต์ -->
+    <input type="checkbox" id="confirm-bin-modal" class="modal-toggle" />
+    <div class="modal z-[9999]" role="dialog">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">ยืนยันการดำเนินการ</h3>
+            <p class="py-4" id="confirm-bin-message">คุณแน่ใจหรือไม่ว่าต้องการดำเนินการนี้?</p>
+            <div class="modal-action">
+                <label for="confirm-bin-modal" class="btn">ยกเลิก</label>
+                <button class="btn btn-primary" onclick="submitConfirmedBin()">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+
 
 
     <!-- Include SortableJS หรือ drag & drop lib อื่น -->
@@ -341,38 +354,39 @@
             });
         })
 
-        saveBtn.addEventListener('click', () => {
-            const publicIds = [...publicList.querySelectorAll('.post-item')].map((el, idx) => ({
-                id: el.dataset.id,
-                order: idx,
-                is_public: true
-            }));
-            const hiddenIds = [...hiddenList.querySelectorAll('.post-item')].map((el, idx) => ({
-                id: el.dataset.id,
-                order: idx,
-                is_public: false
-            }));
-            const combined = [...publicIds, ...hiddenIds];
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                const publicIds = [...publicList.querySelectorAll('.post-item')].map((el, idx) => ({
+                    id: el.dataset.id,
+                    order: idx,
+                    is_public: true
+                }));
+                const hiddenIds = [...hiddenList.querySelectorAll('.post-item')].map((el, idx) => ({
+                    id: el.dataset.id,
+                    order: idx,
+                    is_public: false
+                }));
+                const combined = [...publicIds, ...hiddenIds];
 
-            fetch("{{ route('manage.post.reorder') }}", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    },
-                    body: JSON.stringify({
-                        updates: combined
+                fetch("{{ route('manage.post.reorder') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            updates: combined
+                        })
                     })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        saveBtn.classList.add('hidden');
-                        alertMessage('success', 'บันทึกเรียบร้อย');
-                    }
-                });
-        });
-
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            saveBtn.classList.add('hidden');
+                            alertMessage('success', 'บันทึกเรียบร้อย');
+                        }
+                    });
+            });
+        }
 
         function openCreateModal() {
             createModal.showModal();
@@ -520,6 +534,9 @@
         }
 
         /* ---------- ส่ง restore / delete ทีละหลายรายการ ---------- */
+        let binAction = null; // เก็บ action ชั่วคราว
+        let selectedIds = [];
+
         function submitBin(action) {
             const ids = [...document.querySelectorAll('.item-check:checked')]
                 .map(cb => cb.value);
@@ -529,10 +546,29 @@
                 return;
             }
 
-            const url = action === 'restore' ?
+            binAction = action;
+            selectedIds = ids;
+
+            // ✅ ปิด binModal ก่อนเปิด confirm
+            if (typeof binModal !== 'undefined') {
+                binModal.close();
+            }
+
+            // เปลี่ยนข้อความตาม action
+            const actionText = action === 'restore' ? 'กู้คืน' : 'ลบถาวร';
+            document.getElementById('confirm-bin-message').innerText =
+                `คุณแน่ใจหรือไม่ว่าต้องการ"${actionText}"โพสต์ที่เลือก?`;
+
+            // เปิด modal
+            document.getElementById('confirm-bin-modal').checked = true;
+        }
+
+        function submitConfirmedBin() {
+            const url = binAction === 'restore' ?
                 '{{ route('manage.post.restore') }}' :
                 '{{ route('manage.post.delete') }}';
-            const method = action === 'restore' ? 'POST' : 'DELETE';
+
+            const method = binAction === 'restore' ? 'POST' : 'DELETE';
 
             fetch(url, {
                     method: 'POST',
@@ -541,11 +577,23 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: JSON.stringify({
-                        ids
+                        ids: selectedIds
                     })
                 })
-                .then(res => res.ok ? location.reload() : alertMessage('error', 'ดำเนินการไม่สำเร็จ'))
-                .catch(err => console.error(err));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alertMessage('success', data.message || 'ดำเนินการสำเร็จ');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        alertMessage('error', data.message || 'เกิดข้อผิดพลาด');
+                    }
+                })
+                .catch(() => {
+                    alertMessage('error', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+                });
         }
     </script>
 
@@ -563,13 +611,17 @@
                 toast.remove();
             }, 3000);
         }
+    </script>
 
-        @if (session('success'))
-            alertMessage('success', "{{ session('success') }}")
-        @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            @if (session('success'))
+                alertMessage('success', "{{ session('success') }}")
+            @endif
 
-        @if (session('error'))
-            alertMessage('error', "{{ session('error') }}")
-        @endif
+            @if (session('error'))
+                alertMessage('error', "{{ session('error') }}")
+            @endif
+        })
     </script>
 </x-app-layout>
