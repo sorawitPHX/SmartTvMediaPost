@@ -11,6 +11,8 @@ if [ ! -L "/var/www/html/public/storage" ]; then
     php artisan storage:link
 fi
 
+npm run build
+
 # เคลียร์ + แคชใหม่ให้ชัวร์
 php artisan config:clear
 php artisan config:cache
