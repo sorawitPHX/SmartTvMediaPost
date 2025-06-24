@@ -3,7 +3,7 @@ FROM php:8.3-fpm
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git zip unzip curl libzip-dev libpng-dev libonig-dev nodejs npm
+    git zip unzip curl libzip-dev libpng-dev libonig-dev nodejs npm dos2unix
 
 # PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql zip gd
@@ -30,5 +30,6 @@ RUN php artisan storage:link
 
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
