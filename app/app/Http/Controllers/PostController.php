@@ -41,14 +41,14 @@ class PostController extends Controller
     {
         $data = $request->all();
         /* upload file → storage/app/public/posts/… */
-        $path = $request->file('file')->store('posts', 'public');
-
         // (option) ตรวจความยาววิดีโอหากเป็น video และ duration ≠ -1
         // if ($data['type'] === 'video' && $data['duration'] !== -1) {
         //     // NOTE: ถ้าต้องแม่นยำให้ใช้ FFprobe; ที่นี่สมมติว่า dev ติดตั้งไว้และ helper exist
         //     $videoSeconds = get_video_duration(storage_path("app/public/{$path}")); // helper ของคุณ
         //     abort_if($data['duration'] > $videoSeconds, 422, 'Duration เกินความยาววิดีโอ');
         // }
+        $path = $request->file('file')->store('posts', 'public');
+
 
         $result = Post::create([
             'user_id'   => Auth::id(),
@@ -157,9 +157,10 @@ class PostController extends Controller
         $posts = Post::withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($posts as $post) {
-            $filePath = storage_path('app/public/' . $post->filename);
-            if (file_exists($filePath)) {
-                unlink($filePath); // ลบไฟล์จาก disk
+            // ตรวจสอบว่าไฟล์นั้นเป็นไฟล์จริงๆ และไม่ใช่ null หรือ string ว่างเปล่า
+            if ($post->filename && Storage::disk('public')->exists($post->filename)) {
+                // ใช้ Storage Facade เพื่อลบไฟล์
+                Storage::disk('public')->delete($post->filename);
             }
         }
 
