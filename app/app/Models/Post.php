@@ -20,5 +20,10 @@ class Post extends Model
         'is_public',
         'is_mute',
         'order',
+        'smart_tv_id'
     ];
+
+    public function smartTv() {
+        return $this->belongsTo(SmartTv::class, 'smart_tv_id', 'id');
+    }
 }

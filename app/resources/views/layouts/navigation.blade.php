@@ -17,7 +17,7 @@
                     <x-nav-link :href="route('manage.dashboard')" :active="request()->routeIs('manage.dashboard')">
                         {{ __('แดชบอร์ด') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('manage.post')" :active="request()->routeIs('manage.post')">
+                    <x-nav-link :href="route('manage.smarttvs.index')" :active="request()->routeIs('manage.smarttvs.index')">
                         {{ __('จัดการโพสต์') }}
                     </x-nav-link>
                     @if (Auth::user()->role == 'admin')
@@ -88,7 +88,7 @@
             <x-responsive-nav-link :href="route('manage.dashboard')" :active="request()->routeIs('manage.dashboard')">
                 {{ __('แดชบอร์ด') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('manage.post')" :active="request()->routeIs('manage.post')">
+            <x-responsive-nav-link :href="route('manage.smarttvs.index')" :active="request()->routeIs('manage.smarttvs.index')">
                 {{ __('จัดการโพสต์') }}
             </x-responsive-nav-link>
             @if (Auth::user()->role == 'admin')

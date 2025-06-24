@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\SmartTv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -22,7 +23,10 @@ class PostController extends Controller
         ];
         $posts = Post::orderBy('order')->get();
         $deleted_posts = Post::onlyTrashed()->get();
-        return view('manage.post', compact('posts', 'deleted_posts', 'translation'));
+        return view(
+            'manage.post',
+            compact('posts', 'deleted_posts', 'translation')
+        );
     }
 
     /**
@@ -40,13 +44,6 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-        /* upload file → storage/app/public/posts/… */
-        // (option) ตรวจความยาววิดีโอหากเป็น video และ duration ≠ -1
-        // if ($data['type'] === 'video' && $data['duration'] !== -1) {
-        //     // NOTE: ถ้าต้องแม่นยำให้ใช้ FFprobe; ที่นี่สมมติว่า dev ติดตั้งไว้และ helper exist
-        //     $videoSeconds = get_video_duration(storage_path("app/public/{$path}")); // helper ของคุณ
-        //     abort_if($data['duration'] > $videoSeconds, 422, 'Duration เกินความยาววิดีโอ');
-        // }
         $path = $request->file('file')->store('posts', 'public');
 
 
@@ -59,6 +56,7 @@ class PostController extends Controller
             'is_public' => isset($data['is_public']),
             'duration'  => $data['duration'] ?? -1,
             'order'     => $data['order'] ?? 0,
+            'smart_tv_id'     => $data['smart_tv_id'],
         ]);
 
         return back()->with('success', 'สร้างโพสต์เรียบร้อย');
@@ -110,7 +108,7 @@ class PostController extends Controller
     {
         //
         $post->delete();
-        return back()->with('success', 'ลบโพสต์ (กู้คืนได้) สำเร็จ');
+        return back()->with('success', 'ลบโพสต์สำเร็จ (สามารถกู้คืนได้)');
     }
 
     /**  POST /manage/post/{id}/restore – กู้คืนโพสต์ที่ลบแล้ว */
@@ -177,5 +175,14 @@ class PostController extends Controller
             'message' => 'ลบถาวรแล้วพร้อมไฟล์ใน storage'
         ]);
         // return back()->with('success', 'ลบถาวรแล้วพร้อมไฟล์ใน storage');
+    }
+
+    public function showBySmartTv(SmartTv $smartTv)
+    {
+        $posts = Post::where('is_public', true)
+            ->where('smart_tv_id', $smartTv->id)
+            ->orderBy('order')
+            ->get();
+        return response()->json($posts);
     }
 }

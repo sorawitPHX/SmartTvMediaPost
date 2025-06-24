@@ -21,6 +21,7 @@ return new class extends Migration
             $table->boolean('is_public')->default(true);
             $table->integer('duration')->default(-1); // วินาที
             $table->integer('order')->default(0);
+            $table->foreignId('smart_tv_id')->constrained('smart_tvs')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -31,6 +32,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        // Schema::dropIfExists('posts');
+        Schema::table('posts', function (Blueprint $table) {
+            $table->dropForeign(['smart_tv_id']);
+            $table->dropColumn('smart_tv_id');
+        });
     }
 };

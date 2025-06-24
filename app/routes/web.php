@@ -4,10 +4,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SlideController;
+use App\Http\Controllers\SmartTvController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SlideController::class, 'index'])->name('home');
+Route::get('/posts/smarttv/{smartTv}', [PostController::class, 'showBySmartTv'])->name('posts.showBySmartTv');
 
 Route::middleware('auth')->group(function () {
     Route::get('/manage', [DashboardController::class, 'index'])->name('manage.dashboard');
@@ -26,6 +28,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::prefix('/manage/smarttvs')->name('manage.smarttvs.')->group(function () {
+        Route::get('/', [SmartTvController::class, 'index'])->name('index');
+        Route::post('/', [SmartTvController::class, 'store'])->name('store');
+        Route::put('/{smarttv}', [SmartTvController::class, 'update'])->name('update');
+        Route::delete('/{smarttv}', [SmartTvController::class, 'destroy'])->name('destroy');
+        Route::get('/{smarttv}', [SmartTvController::class, 'show'])->name('show');
+        Route::post('/restore', [SmartTvController::class, 'restore'])->name('restore');
+        Route::post('/force', [SmartTvController::class, 'forceDelete'])->name('forceDelete');
+    });
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('manage')->group(function () {

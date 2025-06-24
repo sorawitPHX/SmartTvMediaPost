@@ -15,6 +15,9 @@ export default {
         //         sans: ['Figtree', ...defaultTheme.fontFamily.sans],
         //     },
         // },
+        fontFamily: {
+            sans: ['Kanit', 'sans-serif'],
+        },
     },
 
     plugins: [
