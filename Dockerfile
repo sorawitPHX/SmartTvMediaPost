@@ -32,4 +32,7 @@ COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 
+RUN echo "upload_max_filesize=5000M" > /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size=5000M" >> /usr/local/etc/php/conf.d/uploads.ini
+
 ENTRYPOINT ["/entrypoint.sh"]

@@ -19,6 +19,9 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
+
 # 🟢 Start php-fpm in foreground
 echo "⚙️ Launching PHP-FPM in foreground..."
 exec php-fpm
