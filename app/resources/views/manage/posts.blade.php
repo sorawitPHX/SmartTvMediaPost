@@ -4,7 +4,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight flex gap-3 items-center">
-            <a href="{{ route('manage.smarttvs.index') }}" class="btn btn-neutral">
+            <a href="{{ route('manage.smarttvs.index') }}" class="btn btn-primary">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                     class="bi bi-caret-left-fill" viewBox="0 0 16 16">
                     <path
@@ -16,7 +16,7 @@
             </a>
             <div class="breadcrumbs text-sm">
                 <ul>
-                    <li><a href="{{ route('manage.smarttvs.index') }}">Smart TV ทั้งหมด</a></li>
+                    <li><a href="{{ route('manage.smarttvs.index') }}">จัดการ Smart TV</a></li>
                     <li class="opacity-70">จัดการโพสต์</li>
                 </ul>
             </div>
@@ -31,7 +31,15 @@
                         <div>
                             <h1 class="text-3xl font-bold text-gray-900 ">
                                 <span class="">Smart TV</span>
-                                <span class="badge badge-info">{{ $smarttv->name }}</span>
+                                <span class="badge badge-primary">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    {{ $smarttv->name }}
+                                </span>
                             </h1>
                             <p class="text-gray-600 mt-1">จัดการโพสต์และการแสดงผลของโพสต์</p>
                         </div>
@@ -233,7 +241,7 @@
 
 
                 <label class="flex items-center gap-2 mb-2">
-                    <input type="checkbox" checked name="is_public" class="checkbox"> สาธารณะ
+                    <input type="checkbox" checked name="is_public" class="checkbox"> แสดงต่อสาธารณะ
                 </label>
                 <label class="flex items-center gap-2 mb-2">
                     <input type="checkbox" disabled name="is_mute" class="checkbox"> ปิดเสียงวิดีโอ
@@ -283,7 +291,7 @@
                         class="input input-bordered w-full mb-2">
                 </fieldset>
                 <label class="flex items-center gap-2 mb-2">
-                    <input type="checkbox" name="is_public" id="editPublic" class="checkbox"> สาธารณะ
+                    <input type="checkbox" name="is_public" id="editPublic" class="checkbox"> แสดงต่อสาธารณะ
                 </label>
                 <label class="flex items-center gap-2 mb-2">
                     <input type="checkbox" name="is_mute" id="editMute" class="checkbox"> ปิดเสียง

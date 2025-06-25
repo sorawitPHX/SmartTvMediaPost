@@ -5,7 +5,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('จัดการโพสต์') }}
+            {{ __('จัดการ Smart TV') }}
         </h2>
     </x-slot>
 
@@ -15,10 +15,10 @@
                 <div class="p-6">
 
                     {{-- Header Bar --}}
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex gap-3 flex-col sm:flex-row items-center justify-between">
                         <div>
                             <h1 class="text-3xl font-bold text-gray-900 ">
-                                <span class="">Smart TV ทั้งหมด</span>
+                                <span class="">รายการ Smart TV ทั้งหมด</span>
                             </h1>
                             <p class="text-gray-600 mt-1">จัดการสมาร์ททีวีและโพสต์ภายใน</p>
                         </div>
@@ -76,7 +76,7 @@
                                             <button class="btn btn-sm btn-warning"
                                                 onclick="openModal({{ $tv }})">แก้ไข</button>
                                             <button class="btn btn-sm btn-error"
-                                                onclick="deleteSmartTv({{ $tv->id }})">ลบ</button>
+                                                onclick="openModalDelete({{ $tv->id }}, '{{ $tv->name }}')">ลบ</button>
                                         </div>
                                     </div>
                                 </div>
@@ -94,14 +94,19 @@
                             <h3 class="font-bold text-lg" id="modalTitle">เพิ่ม Smart TV</h3>
                             <form id="smarttvForm" class="space-y-4 mt-4">
                                 <input type="hidden" id="smarttv_id">
-                                <div class="form-control">
+                                {{-- <div class="form-control">
                                     <label class="label">ชื่อ Smart TV</label>
                                     <input type="text" id="name" class="input input-bordered" required>
-                                </div>
+                                </div> --}}
+                                <fieldset class="fieldset">
+                                    <legend class="fieldset-legend">ชื่อ Smart TV</legend>
+                                    <input required placeholder="ชื่อ Smart TV" type="text" id="name" name="name"
+                                        class="input input-neutral w-full">
+                                </fieldset>
                                 <div class="form-control">
                                     <label class="cursor-pointer label">
                                         <span class="label-text">แสดงต่อสาธารณะ</span>
-                                        <input type="checkbox" id="is_public" class="checkbox">
+                                        <input type="checkbox" checked id="is_public" class="checkbox">
                                     </label>
                                 </div>
                                 <div class="modal-action">
@@ -140,6 +145,19 @@
                         </div>
                     </dialog>
 
+                    <!-- Delete Confirm Modal -->
+                    <dialog id="deleteModal" class="modal">
+                        <div class="modal-box">
+                            <h3 class="font-bold text-lg">ยืนยันการลบ</h3>
+                            <p class="py-4">คุณแน่ใจหรือไม่ว่าต้องการลบ Smart TV <span class="font-bold"
+                                    id="spanSmartTvName"></span> ?</p>
+                            <div class="modal-action">
+                                <button type="submit" data-id='' onclick="deleteSmartTv(this)"
+                                    class="btn btn-error">ยืนยันลบ</button>
+                                <button type="button" onclick="deleteModal.close()" class="btn">ยกเลิก</button>
+                            </div>
+                        </div>
+                    </dialog>
                 </div>
             </div>
         </div>
@@ -191,8 +209,18 @@
                 });
         }
 
-        function deleteSmartTv(id) {
-            if (!confirm('ต้องการลบรายการนี้หรือไม่?')) return;
+        function openModalDelete(id, name) {
+            deleteModal.showModal()
+            deleteModal.querySelector('#spanSmartTvName').innerHTML = `${name}`
+            deleteModal.querySelector('button[type=submit]').dataset.id = id
+        }
+
+        function deleteSmartTv(btn) {
+            let id = btn.dataset.id
+            if (!id) return alertMessage('error', 'เกิดข้อผิดพลาด')
+            btn.disalbed = true
+
+            // if (!confirm('ต้องการลบรายการนี้หรือไม่?')) return;
 
             fetch(`/manage/smarttvs/${id}`, {
                     method: 'DELETE',
